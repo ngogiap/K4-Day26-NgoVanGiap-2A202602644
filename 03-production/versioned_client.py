@@ -4,12 +4,20 @@ import asyncio
 import json
 import sys
 
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+if sys.stderr and hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8")
+
+from pathlib import Path
+
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 
 async def main() -> None:
-    params = StdioServerParameters(command=sys.executable, args=["versioned_server.py"])
+    server_path = str(Path(__file__).parent / "versioned_server.py")
+    params = StdioServerParameters(command=sys.executable, args=[server_path])
 
     async with stdio_client(params) as (read, write):
         async with ClientSession(read, write) as session:
